@@ -1,2 +1,4 @@
 pandas==1.2.3
 scikit-learn==0.24.1
+
+dvc[gdrive]==2.3.0

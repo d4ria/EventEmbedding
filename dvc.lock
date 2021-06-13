@@ -1,0 +1,16 @@
+schema: '2.0'
+stages:
+  preprocess_data:
+    cmd: PYTHONPATH=. python3 scripts/preprocess_data.py
+    deps:
+    - path: scripts/preprocess_data.py
+      md5: fa82a62152075a35fe17727a31d3a7b9
+      size: 313
+    params:
+      params.yaml:
+        datapath: data/comments.csv
+        timedelta: D
+    outs:
+    - path: data/preprocessed_dataframe.pkl
+      md5: c302c7f04157fc992fcb545f0a78c9a7
+      size: 11491431
