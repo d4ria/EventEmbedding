@@ -1,0 +1,10 @@
+stages:
+  preprocess_data:
+    cmd: PYTHONPATH=. python3 scripts/preprocess_data.py
+    deps:
+    - scripts/preprocess_data.py
+    params:
+    - datapath
+    - timedelta
+    outs:
+    - data/preprocessed_dataframe.pkl
