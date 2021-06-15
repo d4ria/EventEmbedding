@@ -1,2 +1,3 @@
 timedelta: 'D'
 datapath: 'data/comments.csv'
+data_ratio: 0.1
