@@ -68,8 +68,12 @@ def sample_neighbourhoods(w_path_dict: Dict[Tuple[int, int], float],
                           s: int = 5):
 
     def _sample_node_neighbourhoods(node, neighbors, probs):
-        return [np.random.choice(neighbors, size=s, replace=False, p=probs) for _ in range(nb)]
-    # co robić jak s > liczba sąsiadów? ma być z replacement?
+        if len(neighbors) < s:
+            return [[node] + list(np.random.choice(neighbors, size=s, replace=True, p=probs))
+                    for _ in range(nb)]
+        else:
+            return [[node] + list(np.random.choice(neighbors, size=s, replace=True, p=probs))
+                    for _ in range(nb)]
 
     neighbourhoods = []
     edges = _create_edges_list(w_path_dict)
@@ -80,16 +84,32 @@ def sample_neighbourhoods(w_path_dict: Dict[Tuple[int, int], float],
 
         predecessors = edges[0, edges[1, :] == node]
         successors = edges[1, edges[0, :] == node]
-        neighbors = np.concatenate((predecessors, predecessors), axis=None)
+        neighbors = np.concatenate((predecessors, successors), axis=None)
 
-        F_path_denominator = sum([w_path_dict[(node, neigh)] for neigh in neighbors])
-        F_co_denominator = sum([w_co_dict[(src, trt, *event_to_nodes[neigh])]
-                                for neigh in neighbors])
+        if neighbors.size == 0:
+            continue
+        F_path_denominator = sum([w_path_dict[(pred, node)] for pred in predecessors]) + \
+                             sum([w_path_dict[(node, succ)] for succ in successors])
+        F_co_denominator = sum([w_co_dict.get((*event_to_nodes[pred], src, trt), 0) for pred in predecessors]) + \
+                           sum([w_co_dict.get((src, trt, *event_to_nodes[succ]), 0) for succ in successors])
 
-        probabilities = [alpha * w_path_dict[(node, neigh)] / F_path_denominator +
-                         (1 - alpha) * w_co_dict[(src, trt, *event_to_nodes[neigh])] / F_co_denominator
-                         for neigh in neighbors]
-        # dodać petle po ns
+        if F_path_denominator == 0:
+            probabilities = [(1 - alpha) * w_co_dict.get((*event_to_nodes[pred], src, trt), 0) / F_co_denominator
+                             for pred in predecessors] + \
+                            [(1 - alpha) * w_co_dict.get((src, trt, *event_to_nodes[succ]), 0) / F_co_denominator
+                             for succ in successors]
+        elif F_co_denominator == 0:
+            probabilities = [alpha * w_path_dict[(pred, node)] / F_path_denominator for pred in predecessors] + \
+                            [alpha * w_path_dict[(node, succ)] / F_path_denominator for succ in successors]
+        else:
+            probabilities = [alpha * w_path_dict[(pred, node)] / F_path_denominator +
+                             (1 - alpha) * w_co_dict.get((*event_to_nodes[pred], src, trt), 0) / F_co_denominator
+                             for pred in predecessors] + \
+                            [alpha * w_path_dict[(node, succ)] / F_path_denominator +
+                             (1 - alpha) * w_co_dict.get((src, trt, *event_to_nodes[succ]), 0) / F_co_denominator
+                             for succ in successors]
+        probabilities = probabilities / sum(probabilities)
+
         node_nbrhds = _sample_node_neighbourhoods(node, neighbors, probabilities)
         neighbourhoods.extend(node_nbrhds)
 

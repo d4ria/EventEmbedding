@@ -1,3 +1,8 @@
 timedelta: 'D'
 datapath: 'data/comments.csv'
 data_ratio: 0.1
+
+sampling:
+  alpha: 0.5
+  nb: 5
+  s: 10

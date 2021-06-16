@@ -20,3 +20,14 @@ stages:
       - data/w_path_dict.pkl
       - data/w_co_dict.pkl
       - data/event_to_nodes.pkl
+
+  sample_neighbourhoods:
+    cmd: PYTHONPATH=. python3 scripts/sample_neighbourhoods.py
+    deps:
+      - scripts/sample_neighbourhoods.py
+    params:
+      - sampling.alpha
+      - sampling.nb
+      - sampling.s
+    outs:
+      - data/sampled_neighbourhoods.pkl
