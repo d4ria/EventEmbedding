@@ -8,3 +8,26 @@ stages:
     - timedelta
     outs:
     - data/preprocessed_dataframe.pkl
+
+  calculate_event_graph_weights:
+    cmd: PYTHONPATH=. python3 scripts/create_event_graph.py
+    deps:
+      - scripts/create_event_graph.py
+    params:
+      - timedelta
+      - data_ratio
+    outs:
+      - data/w_path_dict.pkl
+      - data/w_co_dict.pkl
+      - data/event_to_nodes.pkl
+
+  sample_neighbourhoods:
+    cmd: PYTHONPATH=. python3 scripts/sample_neighbourhoods.py
+    deps:
+      - scripts/sample_neighbourhoods.py
+    params:
+      - sampling.alpha
+      - sampling.nb
+      - sampling.s
+    outs:
+      - data/sampled_neighbourhoods.pkl

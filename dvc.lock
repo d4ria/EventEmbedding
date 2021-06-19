@@ -4,8 +4,8 @@ stages:
     cmd: PYTHONPATH=. python3 scripts/preprocess_data.py
     deps:
     - path: scripts/preprocess_data.py
-      md5: fa82a62152075a35fe17727a31d3a7b9
-      size: 313
+      md5: ff6d83f4a84dd6e325e8088b22366c80
+      size: 338
     params:
       params.yaml:
         datapath: data/comments.csv
@@ -14,3 +14,38 @@ stages:
     - path: data/preprocessed_dataframe.pkl
       md5: c302c7f04157fc992fcb545f0a78c9a7
       size: 11491431
+  calculate_event_graph_weights:
+    cmd: PYTHONPATH=. python3 scripts/create_event_graph.py
+    deps:
+    - path: scripts/create_event_graph.py
+      md5: 979983a0d20b3aab28e193325dfea9c1
+      size: 738
+    params:
+      params.yaml:
+        data_ratio: 0.1
+        timedelta: D
+    outs:
+    - path: data/event_to_nodes.pkl
+      md5: 918120497ab0e78ec78f4c31b9b152cb
+      size: 1544123
+    - path: data/w_co_dict.pkl
+      md5: 0c7b361b0edae0fc3d318c5eab756a56
+      size: 78770
+    - path: data/w_path_dict.pkl
+      md5: e74dc5b1a8373c48fb045313906fb2fa
+      size: 337384
+  sample_neighbourhoods:
+    cmd: PYTHONPATH=. python3 scripts/sample_neighbourhoods.py
+    deps:
+    - path: scripts/sample_neighbourhoods.py
+      md5: 19410dd274e11c012d415dcbf0fd4215
+      size: 786
+    params:
+      params.yaml:
+        sampling.alpha: 0.5
+        sampling.nb: 5
+        sampling.s: 10
+    outs:
+    - path: data/sampled_neighbourhoods.pkl
+      md5: 37d05cbf74a73af38ce56db0a31398a3
+      size: 4307116
