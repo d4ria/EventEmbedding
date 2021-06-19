@@ -3,3 +3,4 @@
 /w_path_dict.pkl
 /w_co_dict.pkl
 /sampled_neighbourhoods.pkl
+/event_to_nodes.pkl
