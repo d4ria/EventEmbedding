@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from typing import Tuple, Dict
+from typing import Tuple, Dict, List
 import tqdm
 
 
@@ -65,7 +65,18 @@ def sample_neighbourhoods(w_path_dict: Dict[Tuple[int, int], float],
                           event_to_nodes: Dict[int, Tuple[int, int]],
                           alpha: float = 0.5,
                           nb: int = 10,
-                          s: int = 5):
+                          s: int = 5) -> List[List[int]]:
+    """
+
+    :param w_path_dict: a dictionary with path weights that has 2-element tuples as keys and weights as values
+    :param w_co_dict: a dictionary with co-occurance weights that has 4-element tuples as keys and weights as values
+    :param event_to_nodes: a dictionary with event indices as keys and 2-element tuples as values, denoting
+              source node and target node of an event
+    :param alpha: coefficient scaling the contribution of the two types of weights
+    :param nb: number of sampled neighbourhoods per node
+    :param s: size of each sampled neighbourhood
+    :return: a list of sampled neighbourhoods
+    """
 
     def _sample_node_neighbourhoods(node, neighbors, probs):
         if len(neighbors) < s:
