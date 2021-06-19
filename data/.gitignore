@@ -1,2 +1,5 @@
 /comments.csv
 /preprocessed_dataframe.pkl
+/w_path_dict.pkl
+/w_co_dict.pkl
+/event_to_nodes.pkl
