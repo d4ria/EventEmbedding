@@ -4,3 +4,4 @@
 /w_co_dict.pkl
 /sampled_neighbourhoods.pkl
 /event_to_nodes.pkl
+/embeddings.pkl

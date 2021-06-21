@@ -1,51 +1,85 @@
 schema: '2.0'
 stages:
   preprocess_data:
-    cmd: PYTHONPATH=. python3 scripts/preprocess_data.py
+    cmd: python -m scripts.preprocess_data
     deps:
     - path: scripts/preprocess_data.py
       md5: ff6d83f4a84dd6e325e8088b22366c80
-      size: 338
+      size: 349
     params:
       params.yaml:
         datapath: data/comments.csv
-        timedelta: D
+        timedelta: h
     outs:
     - path: data/preprocessed_dataframe.pkl
-      md5: c302c7f04157fc992fcb545f0a78c9a7
-      size: 11491431
+      md5: 98e64bc7c87a1c9128b5e1bc2e795bdd
+      size: 7182517
   calculate_event_graph_weights:
     cmd: python -m scripts.create_event_graph
     deps:
+    - path: data/preprocessed_dataframe.pkl
+      md5: 98e64bc7c87a1c9128b5e1bc2e795bdd
+      size: 7182517
     - path: scripts/create_event_graph.py
-      md5: 979983a0d20b3aab28e193325dfea9c1
-      size: 763
+      md5: 122ef8c084ae0e647ca2cfa5723b8e08
+      size: 813
     params:
       params.yaml:
-        data_ratio: 1.0
-        timedelta: D
+        data_ratio: 0.15
+        timedelta: h
     outs:
     - path: data/event_to_nodes.pkl
-      md5: dbca456b3af1af49771c8028004789ab
-      size: 16030242
+      md5: b9ed95ea1eda502c96ef170af4884b70
+      size: 2316289
     - path: data/w_co_dict.pkl
-      md5: 0c7b361b0edae0fc3d318c5eab756a56
-      size: 78770
+      md5: 66b5e06ec1c455f15d2af5756fc911e1
+      size: 11969426
     - path: data/w_path_dict.pkl
-      md5: 42fb56089ad330ca409c0bec4f8ebb99
-      size: 2389924
+      md5: e7d347a6e6c3c9e4cb8418d4af1d01eb
+      size: 36074151
   sample_neighbourhoods:
-    cmd: PYTHONPATH=. python3 scripts/sample_neighbourhoods.py
+    cmd: python -m scripts.sample_neighbourhoods
     deps:
+    - path: data/event_to_nodes.pkl
+      md5: b9ed95ea1eda502c96ef170af4884b70
+      size: 2316289
+    - path: data/w_co_dict.pkl
+      md5: 66b5e06ec1c455f15d2af5756fc911e1
+      size: 11969426
+    - path: data/w_path_dict.pkl
+      md5: e7d347a6e6c3c9e4cb8418d4af1d01eb
+      size: 36074151
     - path: scripts/sample_neighbourhoods.py
       md5: 19410dd274e11c012d415dcbf0fd4215
-      size: 786
+      size: 816
     params:
       params.yaml:
         sampling.alpha: 0.5
-        sampling.nb: 5
+        sampling.nb: 10
         sampling.s: 10
     outs:
     - path: data/sampled_neighbourhoods.pkl
-      md5: 37d05cbf74a73af38ce56db0a31398a3
-      size: 4307116
+      md5: 40a647196212a615f08617375b9c0868
+      size: 107133656
+  apply_skipgram:
+    cmd: python -m scripts.apply_skipgram
+    deps:
+    - path: data/sampled_neighbourhoods.pkl
+      md5: 40a647196212a615f08617375b9c0868
+      size: 107133656
+    params:
+      params.yaml:
+        skipgram.epochs: 20
+        skipgram.min_count: 25
+        skipgram.vector_size: 30
+        skipgram.window: 10
+    outs:
+    - path: data/embeddings.pkl
+      md5: bac1823c2a005fcd6830e456375a8b2a
+      size: 8420996
+  visualize:
+    cmd: python -m scripts.visualize
+    deps:
+    - path: data/embeddings.pkl
+      md5: bac1823c2a005fcd6830e456375a8b2a
+      size: 8420996
