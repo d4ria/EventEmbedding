@@ -33,7 +33,7 @@ def calculate_event_graph_weights(df: pd.DataFrame,
         src, trt, timestamp = row["i"], row["j"], row["t"]
         event_to_nodes[index] = (src, trt)
 
-        node_sharing = df[((df['i'].isin([src, trt])) | (df['j'].isin([src, trt]))) & df['t'] > timestamp]
+        node_sharing = df[((df['i'].isin([src, trt])) | (df['j'].isin([src, trt]))) & (df['t'] > timestamp)]
         w_path = 1 / (1 + abs(node_sharing["t"] - timestamp))
 
         for other_index, other_row in node_sharing.iterrows():
