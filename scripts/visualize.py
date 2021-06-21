@@ -1,8 +1,5 @@
-from itertools import product
-import umap
-import numpy as np
 import pandas as pd
-import plotly.express as px
+from src.utils import visualize_embeddings
 
 import yaml
 import pickle
@@ -18,18 +15,4 @@ if __name__ == "__main__":
 
     preprocessed_df = pd.read_pickle(DATA_PATH)
 
-    X, keys = [], []
-    for key in embeddings:
-        X.append(embeddings[key])
-        keys.append(key)
-
-    X = np.array(X)
-    reducer = umap.UMAP(n_neighbors=200)
-    X_embedded = reducer.fit_transform(X)
-    embeddings_df = pd.DataFrame(X_embedded, columns=['x1', 'x2'])
-    embeddings_df['t'] = preprocessed_df.iloc[[
-        int(k) for k in keys]]['t'].values
-
-    fig = px.scatter(embeddings_df, x="x1", y="x2",
-                     color="t", hover_data=['t'])
-    fig.write_html("data/embeddings.html")
+    visualize_embeddings(embeddings, preprocessed_df)

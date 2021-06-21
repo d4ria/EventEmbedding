@@ -1,5 +1,4 @@
-from itertools import product
-from gensim.models import Word2Vec
+from src.skipgram import get_embeddings
 
 import yaml
 import pickle
@@ -15,18 +14,12 @@ EPOCHS = params['skipgram']['epochs']
 if __name__ == "__main__":
     with open(f'data/sampled_neighbourhoods.pkl', 'rb') as handle:
         nbs = pickle.load(handle)
-
-    model = Word2Vec(sentences=nbs, 
-                     vector_size=VECTOR_SIZE, 
-                     window=WINDOW_SIZE, 
-                     min_count=MIN_WORD_COUNT, 
-                     epochs=EPOCHS,
-                     sg=1)
     
-    X = model.wv.get_normed_vectors()
-    keys = model.wv.index_to_key
-
-    embeddings = {keys[idx]: X[idx] for idx in range(len(keys))}
+    embeddings = get_embeddings(nbs,
+                                VECTOR_SIZE,
+                                WINDOW_SIZE,
+                                MIN_WORD_COUNT,
+                                EPOCHS)
 
     with open(f'data/embeddings.pkl', 'wb') as handle:
         pickle.dump(embeddings, handle)

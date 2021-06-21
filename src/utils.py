@@ -1,7 +1,10 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import OrdinalEncoder
-from typing import Literal, Optional
+import plotly.express as px
+import umap
+
+from typing import Literal, Optional, Dict, List
 
 
 def preprocess_data(data_path: str = 'data/comments.csv',
@@ -40,3 +43,32 @@ def preprocess_data(data_path: str = 'data/comments.csv',
     df = df.sort_values(by='t').reset_index()
 
     return df
+
+def visualize_embeddings(embeddings: Dict[int, List[int]], 
+              events_df: pd.DataFrame,
+              path: str = "data/embeddings.html") -> None:
+    """Generates plotly visualization of embeddings reduced to 2-D space with UMAP algorithm.
+
+    :param embeddings: embeddings generated with skipgram.
+    :type embeddings: Dict[int, List[int]]
+    :param events_df: dataframe with times of events. i-th row contains
+    data for event with key i. Column 't' contains time of the event.
+    :type events_df: pd.DataFrame
+    :param path: path of embeddings visualzation file, defaults to "data/embeddings.html"
+    :type path: str, optional
+    """
+    X, keys = [], []
+    for key in embeddings:
+        X.append(embeddings[key])
+        keys.append(key)
+
+    X = np.array(X)
+    reducer = umap.UMAP(n_neighbors=200)
+    X_embedded = reducer.fit_transform(X)
+    embeddings_df = pd.DataFrame(X_embedded, columns=['x1', 'x2'])
+    embeddings_df['t'] = events_df.iloc[[
+        int(k) for k in keys]]['t'].values
+
+    fig = px.scatter(embeddings_df, x="x1", y="x2",
+                     color="t", hover_data=['t'])
+    fig.write_html(path)
