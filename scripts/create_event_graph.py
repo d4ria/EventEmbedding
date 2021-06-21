@@ -8,14 +8,15 @@ with open("params.yaml", "r") as fd:
     params = yaml.safe_load(fd)
 
 DATA_RATIO = params["data_ratio"]
+DELTA_T = params["delta_t"]
 DATA_PATH = "data/preprocessed_dataframe.pkl"
 
 if __name__ == "__main__":
     df = pd.read_pickle(DATA_PATH)
     df = df.iloc[:int(DATA_RATIO * len(df)), :]
 
-    w_path_dict, w_co_dict, event_to_nodes = calculate_event_graph_weights(df)
-
+    w_path_dict, w_co_dict, event_to_nodes = calculate_event_graph_weights(df, delta_t=DELTA_T)
+    
     with open('data/w_path_dict.pkl', 'wb') as handle:
         pickle.dump(w_path_dict, handle)
 
